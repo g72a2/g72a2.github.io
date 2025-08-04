@@ -68,7 +68,7 @@
         const theta2 = Math.atan(T2);
 
         const angleMrad = Math.min(theta1, theta2) * 1000;
-        resultText = `Required Firing Angle: <strong>${angleMrad.toFixed(2)} mrad</strong>`;
+        resultText = `COMPUTED: <strong>${angleMrad.toFixed(3)} mrad</strong>`;
       }
 
       document.getElementById("result").innerHTML = resultText;
