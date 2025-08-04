@@ -34,14 +34,14 @@
 </head>
 <body>
 
-  <label for="mode">MODE:</label>
+  <label for="mode">Mode:</label>
   <select id="mode" onchange="toggleInputs()">
     <option value="artillery" selected>ARTILLERY</option>
     <option value="mortar">MORTAR</option>
   </select>
 
   <div id="charge-options" style="display:none">
-    <label for="charge">CHARGE PREFERENCE:</label>
+    <label for="charge">Charge Preference:</label>
     <select id="charge">
       <option value="high">HIGH</option>
       <option value="low">LOW</option>
@@ -49,22 +49,22 @@
   </div>
 
   <div id="inputs-artillery">
-    <label for="distance">DISTANCE:</label>
+    <label for="distance">Distance:</label>
     <input type="number" id="distance" value="1000" step="any" />
 
-    <label for="elevation">MRAD OFFSET:</label>
+    <label for="elevation">MRAD Offset:</label>
     <input type="number" id="elevation" value="0" step="any" />
   </div>
 
   <div id="inputs-mortar" style="display:none">
-    <label for="mortarDistance">DISTANCE:</label>
+    <label for="mortarDistance">Distance:</label>
     <input type="number" id="mortarDistance" value="1000" step="any" />
   </div>
 
   <button onclick="calculateAngle()">Compute</button>
 
   <div class="info" id="context-info"></div>
-  <div class="result" id="result">AWAITING INPUT...</div>
+  <div class="result" id="result">READY</div>
 
   <script>
     function toggleInputs() {
@@ -149,7 +149,7 @@
           if (angleRad !== null && !isNaN(angleRad)) {
             const angleMrad = angleRad * 1000;
             time = mortarDistance / (velocity * Math.cos(angleRad));
-            resultText = `COMPUTED: <strong>${angleMrad.toFixed(3)} mrad</strong><br>CHARGE:<strong>${charge.toUpperCase()}</strong><br>SPLASH: <strong>${time.toFixed(2)} s</strong>`;
+            resultText = `COMPUTED: <strong>${angleMrad.toFixed(3)} mrad</strong><br>CHARGE:<strong> ${charge.toUpperCase()}</strong><br>SPLASH: <strong>${time.toFixed(2)}s</strong>`;
           } else {
             resultText = "N/A";
           }
