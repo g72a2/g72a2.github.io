@@ -112,7 +112,7 @@
           const chosenAngleRad = Math.min(theta1, theta2);
           const angleMrad = chosenAngleRad * 1000;
           const time = x / (velocity * Math.cos(chosenAngleRad));
-          resultText = `COMPUTED: <strong>${angleMrad.toFixed(3)} mrad</strong><br>SPLASH: <strong>${time.toFixed(2)} s</strong>`;
+          resultText = `COMPUTED: <strong>${angleMrad.toFixed(3)} mrad</strong><br>SPLASH: <strong>${time.toFixed(2)}s</strong>`;
         }
       } else {
         var charge = document.getElementById("charge").value;
