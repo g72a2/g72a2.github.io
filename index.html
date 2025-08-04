@@ -56,10 +56,14 @@
     <input type="number" id="mortarDistance" value="1000" step="any" />
   </div>
 
-  <button onclick="calculateAngle()">Compute</button>
+  <button onclick="calculateAngle()">COMPUTE</button>
 
-  <div class="result" id="result">Enter values and hit 'Compute'.</div>
-
+  if (mode === "artillery") {
+    <div class="result" id="result">DISTANCE: Direct line-of-sight distance to target.<br>MRAD OFFSET: The elevation to target, found by putting crosshairs on target and reading elevation.</div>
+  } else {
+    <div class="result" id="result">DISTANCE: Direct line-of-sight distance to target.<br>CHARGE PREFERENCE: Will use the selected charge type if possible.<br>High charge allows for steeper firing angles and further ranges with higher splash times.<br>Low charge allows for flatter firing angles and lower splash times.</div>
+  }
+  
   <script>
     function toggleInputs() {
       const mode = document.getElementById("mode").value;
