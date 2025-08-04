@@ -77,7 +77,7 @@
       if (mode === "artillery") {
         context.innerHTML = "DISTANCE: Direct line-of-sight distance to target.<br>MRAD OFFSET: The elevation to target, found by putting crosshairs on target and reading elevation.";
       } else {
-        context.innerHTML = "DISTANCE: Direct line-of-sight distance to target.<br>CHARGE PREFERENCE:<br>Will use the selected charge type if possible:<br>HIGH allows for steeper firing angles and further ranges with higher splash times.<br>LOW allows for flatter firing angles and lower splash times.";
+        context.innerHTML = "DISTANCE: Direct line-of-sight distance to target.<br>CHARGE PREFERENCE:<br>Use preferred charge if possible, but will switch types if target is not inside charge envelope.<br>HIGH allows for steeper firing angles and further ranges with higher splash times.<br>LOW allows for flatter firing angles and lower splash times.";
       }
     }
 
@@ -115,7 +115,7 @@
           resultText = `COMPUTED: <strong>${angleMrad.toFixed(3)} mrad</strong><br>SPLASH: <strong>${time.toFixed(2)} s</strong>`;
         }
       } else {
-        const charge = document.getElementById("charge").value;
+        var charge = document.getElementById("charge").value;
         const mortarDistance = parseFloat(document.getElementById("mortarDistance").value);
         let time = null;
 
@@ -126,17 +126,21 @@
 
           if (charge === "high") {
             if (mortarDistance <= 715) {
+              charge = "low";
               angleRad = (Math.PI / 2 - Math.asin((mortarDistance * 28) / (274 ** 2)) / 2);
               velocity = 274; gravity = 28;
             } else if (mortarDistance <= 5096) {
+              charge = "high";
               angleRad = (Math.PI / 2 - Math.asin((mortarDistance * 26) / (364 ** 2)) / 2);
               velocity = 364; gravity = 26;
             }
           } else if (charge === "low") {
             if (mortarDistance <= 2680) {
+              charge - "low";
               angleRad = (Math.PI / 2 - Math.asin((mortarDistance * 28) / (274 ** 2)) / 2);
               velocity = 274; gravity = 28;
             } else if (mortarDistance <= 5096) {
+              charge = "high";
               angleRad = (Math.PI / 2 - Math.asin((mortarDistance * 26) / (364 ** 2)) / 2);
               velocity = 364; gravity = 26;
             }
@@ -145,7 +149,7 @@
           if (angleRad !== null && !isNaN(angleRad)) {
             const angleMrad = angleRad * 1000;
             time = mortarDistance / (velocity * Math.cos(angleRad));
-            resultText = `COMPUTED: <strong>${angleMrad.toFixed(3)} mrad</strong><br>SPLASH: <strong>${time.toFixed(2)} s</strong>`;
+            resultText = `COMPUTED: <strong>${angleMrad.toFixed(3)} mrad</strong><br>CHARGE:<strong>${charge.toUpperCase()}</strong><br>SPLASH: <strong>${time.toFixed(2)} s</strong>`;
           } else {
             resultText = "N/A";
           }
