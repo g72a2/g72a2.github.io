@@ -11,7 +11,7 @@
       margin: auto;
       padding: 1rem;
     }
-    label, input {
+    label, input, select, button {
       display: block;
       margin: 0.5rem 0;
     }
@@ -28,47 +28,106 @@
   </style>
 </head>
 <body>
-  <h2>Projectile Firing Angle Calculator</h2>
 
-  <label for="distance">Distance (m):</label>
-  <input type="number" id="distance" value="1000" step="any" />
+  <label for="mode">Mode:</label>
+  <select id="mode" onchange="toggleInputs()">
+    <option value="artillery" selected>ARTILLERY</option>
+    <option value="mortar">MORTAR</option>
+  </select>
 
-  <label for="elevation">MRAD Offset:</label>
-  <input type="number" id="elevation" value="0" step="any" />
+  <div id="charge-options" style="display:none">
+    <label for="charge">CHARGE PREFERENCE:</label>
+    <select id="charge">
+      <option value="high">PREFER HI</option>
+      <option value="low">PREFER LO</option>
+    </select>
+  </div>
+
+  <div id="inputs-artillery">
+    <label for="distance">DISTANCE:</label>
+    <input type="number" id="distance" value="1000" step="any" />
+
+    <label for="elevation">MRAD OFFSET:</label>
+    <input type="number" id="elevation" value="0" step="any" />
+  </div>
+
+  <div id="inputs-mortar" style="display:none">
+    <label for="mortarDistance">DISTANCE:</label>
+    <input type="number" id="mortarDistance" value="1000" step="any" />
+  </div>
 
   <button onclick="calculateAngle()">Compute</button>
 
-  <div class="result" id="result">Enter direct distance to target and elevation and hit 'Compute'.</div>
+  <div class="result" id="result">Enter values and hit 'Compute'.</div>
 
   <script>
+    function toggleInputs() {
+      const mode = document.getElementById("mode").value;
+      document.getElementById("inputs-artillery").style.display = mode === "artillery" ? "block": "none";
+      document.getElementById("inputs-mortar").style.display = mode === "mortar" ? "block": "none";
+      document.getElementById("charge-options").style.display = mode === "mortar" ? "block": "none";
+    }
+
     function calculateAngle() {
-      const velocity = 2800.0;
-      const gravity = 26.0;
-      const losDistance = parseFloat(document.getElementById("distance").value);
-      const elevationMrad = parseFloat(document.getElementById("elevation").value);
+      const mode = document.getElementById("mode").value;
+      let velocity, gravity, x, y, resultText = "";
 
-      const inputRad = elevationMrad / 1000;
-      const x = losDistance * Math.cos(inputRad);
-      const y = losDistance * Math.sin(inputRad);
+      if (mode === "artillery") {
+        velocity = 2800.0;
+        gravity = 26.0;
+        const losDistance = parseFloat(document.getElementById("distance").value);
+        const elevationMrad = parseFloat(document.getElementById("elevation").value);
+        const inputRad = elevationMrad / 1000;
+        x = losDistance * Math.cos(inputRad);
+        y = losDistance * Math.sin(inputRad);
 
-      const A = (gravity * x * x) / (2 * velocity * velocity);
-      const B = -x;
-      const C = A + y;
+        const A = (gravity * x * x) / (2 * velocity * velocity);
+        const B = -x;
+        const C = A + y;
 
-      const discriminant = B * B - 4 * A * C;
-      let resultText = "";
+        const discriminant = B * B - 4 * A * C;
 
-      if (discriminant < 0 || isNaN(discriminant)) {
-        resultText = "N/A";
+        if (discriminant < 0 || isNaN(discriminant)) {
+          resultText = "N/A";
+        } else {
+          const T1 = (-B + Math.sqrt(discriminant)) / (2 * A);
+          const T2 = (-B - Math.sqrt(discriminant)) / (2 * A);
+          const theta1 = Math.atan(T1);
+          const theta2 = Math.atan(T2);
+          const chosenAngleRad = Math.min(theta1, theta2);
+          const angleMrad = chosenAngleRad * 1000;
+          const time = x / (velocity * Math.cos(chosenAngleRad));
+          resultText = `COMPUTED: <strong>${angleMrad.toFixed(3)} mrad</strong><br>Time to Impact: <strong>${time.toFixed(2)} s</strong>`;
+        }
       } else {
-        const T1 = (-B + Math.sqrt(discriminant)) / (2 * A);
-        const T2 = (-B - Math.sqrt(discriminant)) / (2 * A);
+        const charge = document.getElementById("charge").value;
+        const mortarDistance = parseFloat(document.getElementById("mortarDistance").value);
 
-        const theta1 = Math.atan(T1);
-        const theta2 = Math.atan(T2);
+        if (mortarDistance < 380 || mortarDistance > 5096) {
+          resultText = "N/A";
+        } else {
+          let angleMrad = null;
 
-        const angleMrad = Math.min(theta1, theta2) * 1000;
-        resultText = `COMPUTED: <strong>${angleMrad.toFixed(3)} mrad</strong>`;
+          if (charge === "high") {
+            if (mortarDistance <= 715) {
+              angleMrad = (Math.PI / 2 - Math.asin((mortarDistance * 28) / (274 ** 2)) / 2) * 1000;
+            } else if (mortarDistance <= 5096) {
+              angleMrad = (Math.PI / 2 - Math.asin((mortarDistance * 26) / (364 ** 2)) / 2) * 1000;
+            }
+          } else if (charge === "low") {
+            if (mortarDistance <= 2680) {
+              angleMrad = (Math.PI / 2 - Math.asin((mortarDistance * 28) / (274 ** 2)) / 2) * 1000;
+            } else if (mortarDistance <= 5096) {
+              angleMrad = (Math.PI / 2 - Math.asin((mortarDistance * 26) / (364 ** 2)) / 2) * 1000;
+            }
+          }
+
+          if (angleMrad !== null && !isNaN(angleMrad)) {
+            resultText = `COMPUTED: <strong>${angleMrad.toFixed(3)} mrad</strong>`;
+          } else {
+            resultText = "N/A";
+          }
+        }
       }
 
       document.getElementById("result").innerHTML = resultText;
