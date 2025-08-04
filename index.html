@@ -31,15 +31,15 @@
 
   <label for="mode">Mode:</label>
   <select id="mode" onchange="toggleInputs()">
-    <option value="artillery" selected>ARTILLERY</option>
-    <option value="mortar">MORTAR</option>
+    <option value="artillery" selected>Artillery</option>
+    <option value="mortar">Mortar</option>
   </select>
 
   <div id="charge-options" style="display:none">
     <label for="charge">CHARGE PREFERENCE:</label>
     <select id="charge">
-      <option value="high">PREFER HI</option>
-      <option value="low">PREFER LO</option>
+      <option value="high">HIGH</option>
+      <option value="low">LOW</option>
     </select>
   </div>
 
@@ -102,28 +102,35 @@
       } else {
         const charge = document.getElementById("charge").value;
         const mortarDistance = parseFloat(document.getElementById("mortarDistance").value);
+        let time = null;
 
         if (mortarDistance < 380 || mortarDistance > 5096) {
           resultText = "N/A";
         } else {
-          let angleMrad = null;
+          let angleRad = null;
 
           if (charge === "high") {
             if (mortarDistance <= 715) {
-              angleMrad = (Math.PI / 2 - Math.asin((mortarDistance * 28) / (274 ** 2)) / 2) * 1000;
+              angleRad = (Math.PI / 2 - Math.asin((mortarDistance * 28) / (274 ** 2)) / 2);
+              velocity = 274; gravity = 28;
             } else if (mortarDistance <= 5096) {
-              angleMrad = (Math.PI / 2 - Math.asin((mortarDistance * 26) / (364 ** 2)) / 2) * 1000;
+              angleRad = (Math.PI / 2 - Math.asin((mortarDistance * 26) / (364 ** 2)) / 2);
+              velocity = 364; gravity = 26;
             }
           } else if (charge === "low") {
             if (mortarDistance <= 2680) {
-              angleMrad = (Math.PI / 2 - Math.asin((mortarDistance * 28) / (274 ** 2)) / 2) * 1000;
+              angleRad = (Math.PI / 2 - Math.asin((mortarDistance * 28) / (274 ** 2)) / 2);
+              velocity = 274; gravity = 28;
             } else if (mortarDistance <= 5096) {
-              angleMrad = (Math.PI / 2 - Math.asin((mortarDistance * 26) / (364 ** 2)) / 2) * 1000;
+              angleRad = (Math.PI / 2 - Math.asin((mortarDistance * 26) / (364 ** 2)) / 2);
+              velocity = 364; gravity = 26;
             }
           }
 
-          if (angleMrad !== null && !isNaN(angleMrad)) {
-            resultText = `COMPUTED: <strong>${angleMrad.toFixed(3)} mrad</strong>`;
+          if (angleRad !== null && !isNaN(angleRad)) {
+            const angleMrad = angleRad * 1000;
+            time = mortarDistance / (velocity * Math.cos(angleRad));
+            resultText = `COMPUTED: <strong>${angleMrad.toFixed(3)} mrad</strong><br>SPLASH: <strong>${time.toFixed(2)} s</strong>`;
           } else {
             resultText = "N/A";
           }
